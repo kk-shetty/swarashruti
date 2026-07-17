@@ -4,13 +4,19 @@ version = "0.1.0"
 description = "Convert hummed audio to instrument playback"
 authors = [{name = "Karthik K Shetty", email = "shetty.karthik1857@gmail.com"}]
 requires-python = ">=3.11"
-dependencies = []   # empty for now
-
-[project.optional-dependencies]
-dev = []            # dev tools go here later
+dependencies = []
 
 [tool.pytest.ini_options]
-# pytest config will go here in SWARA-9
+testpaths = ["tests"]
+addopts = "-v"
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple/"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
 
 [tool.ruff]
 # ruff config will go here in SWARA-10
