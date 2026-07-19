@@ -13,10 +13,16 @@ addopts = "-v"
 [[tool.uv.index]]
 url = "https://pypi.org/simple/"
 
+
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
+    "ruff>=0.15.22",
 ]
 
 [tool.ruff]
-# ruff config will go here in SWARA-10
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
