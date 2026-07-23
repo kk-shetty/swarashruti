@@ -104,6 +104,7 @@ swarashruti/
 ├── data/            # Sample audio and reference data
 ├── docs/
 │   └── adr/         # Architecture decision records
+│   └── references/  # Research and learning material
 └── tests/           # Mirrors core/ structure
     ├── audio/
     ├── pitch/
