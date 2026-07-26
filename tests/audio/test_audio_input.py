@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import scipy.io.wavfile as wavfile
 
-from core.audio.audio_input import CREPE_SAMPLE_RATE, load_audio
+from core.audio.audio_input import PIPELINE_SAMPLE_RATE, load_audio
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def make_mono_wav_file(tmp_path):
     """
 
     def _make_wav_file(
-        sample_rate: int = CREPE_SAMPLE_RATE,
+        sample_rate: int = PIPELINE_SAMPLE_RATE,
         duration: float = 1.0,
         frequency: float = 440.0,
     ) -> str:
@@ -34,7 +34,7 @@ def make_stereo_wav_file(tmp_path):
     """
 
     def _make_wav_file(
-        sample_rate: int = CREPE_SAMPLE_RATE,
+        sample_rate: int = PIPELINE_SAMPLE_RATE,
         duration: float = 1.0,
         left_frequency: float = 440.0,
         right_frequency: float = 540.0,
@@ -54,14 +54,14 @@ def test_resamples_from_44100(make_mono_wav_file) -> None:
     """Test that a WAV file with a sample rate of 44100 Hz is resampled to 16000 Hz."""
     path = make_mono_wav_file(sample_rate=44100)
     y = load_audio(path)
-    assert len(y) == CREPE_SAMPLE_RATE
+    assert len(y) == PIPELINE_SAMPLE_RATE
 
 
 def test_already_16000(make_mono_wav_file) -> None:
     """Test that a WAV file with a sample rate of 16000 Hz is loaded correctly."""
     path = make_mono_wav_file(sample_rate=16000)
     y = load_audio(path)
-    assert len(y) == CREPE_SAMPLE_RATE
+    assert len(y) == PIPELINE_SAMPLE_RATE
     assert isinstance(y, np.ndarray)
 
 
@@ -69,7 +69,7 @@ def test_stereo_to_mono(make_stereo_wav_file) -> None:
     """Test that a stereo WAV file is converted to mono correctly."""
     path = make_stereo_wav_file(sample_rate=16000)
     y = load_audio(path)
-    assert len(y) == CREPE_SAMPLE_RATE
+    assert len(y) == PIPELINE_SAMPLE_RATE
     assert y.ndim == 1  # mono = single dimension
 
 
@@ -90,7 +90,7 @@ def test_unsupported_format(tmp_path) -> None:
 def test_empty_audio_file(tmp_path) -> None:
     """Test that loading an empty audio file raises a ValueError."""
     empty_file = tmp_path / "empty.wav"
-    wavfile.write(str(empty_file), CREPE_SAMPLE_RATE, np.array([], dtype=np.float32))
+    wavfile.write(str(empty_file), PIPELINE_SAMPLE_RATE, np.array([], dtype=np.float32))
     with pytest.raises(ValueError):
         load_audio(str(empty_file))
 

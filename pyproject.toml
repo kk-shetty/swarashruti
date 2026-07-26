@@ -7,6 +7,7 @@ requires-python = ">=3.11"
 dependencies = [
     "librosa>=0.11.0",
     "numpy>=2.4.6",
+    "torchcrepe>=0.0.24",
 ]
 
 [tool.pytest.ini_options]
@@ -15,6 +16,7 @@ addopts = "-v"
 
 [[tool.uv.index]]
 url = "https://pypi.org/simple/"
+default = true
 
 
 [dependency-groups]

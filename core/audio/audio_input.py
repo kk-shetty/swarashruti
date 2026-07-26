@@ -3,8 +3,9 @@ import os
 import librosa
 import numpy as np
 
-# CREPE requires exactly 16 kHz — other rates produce wrong predictions
-CREPE_SAMPLE_RATE = 16000
+# crepetorch will resample to audio to 16kHz
+# However, exclusively resampling before passing to the model is more efficient.
+PIPELINE_SAMPLE_RATE = 16000
 SUPPORTED_AUDIO_FORMATS = {".wav", ".mp3", ".flac", ".ogg"}
 
 
@@ -30,7 +31,7 @@ def load_audio(file_path: str) -> np.ndarray:
         )
 
     try:
-        y, _ = librosa.load(file_path, sr=CREPE_SAMPLE_RATE, mono=True)
+        y, _ = librosa.load(file_path, sr=PIPELINE_SAMPLE_RATE, mono=True)
     except Exception as e:
         raise RuntimeError(f"Error loading audio file '{file_path}': {e}")
 
