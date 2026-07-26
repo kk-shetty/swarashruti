@@ -4,7 +4,7 @@
 SwaraShruti converts hummed or sung audio into realistic instrument playback.
 Name derives from Sanskrit: Swara (a single musical note) + Shruti (pitch / that which is heard).
 
-**Pipeline:** voice/hum input → CREPE pitch detection → pitch correction → MIDI construction → soundfont renderer → instrument audio output
+**Pipeline:** voice/hum input → torchcrepe pitch detection → pitch correction → MIDI construction → soundfont renderer → instrument audio output
 
 **Two parallel goals:** build a working end-to-end product AND gain deep hands-on AI/ML experience.
 
@@ -19,8 +19,8 @@ Name derives from Sanskrit: Swara (a single musical note) + Shruti (pitch / that
 ---
 
 ## Stack
-- Python 3.12, managed via `uv`
-- CREPE (pitch detection), librosa, pretty_midi, pyfluidsynth
+- Python 3.12, managed via `uv`, pinned via `.python-version`
+- torchcrepe (pitch detection), librosa, pretty_midi, pyfluidsynth
 - ruff (linting + formatting), pytest (testing), pre-commit hooks
 - Jira board: `swarashruti.atlassian.net` (project key: SWARA)
 
@@ -49,17 +49,22 @@ models/      — ML model weights
 
 ## Critical environment gotchas
 
-**uv + HubSpot PyPI mirror conflict**
-Global `~/.config/uv/uv.toml` points to HubSpot's internal PyPI mirror. For all personal project uv commands, always pass `--index https://pypi.org/simple/` as a flag. Never modify the global config.
+**Python version**
+`.python-version` at project root pins Python 3.12. uv respects this automatically.
+Never remove it — without it, uv defaults to the highest available Python, which breaks
+older packages like torchcrepe's transitive dependencies.
 
-**npm global installs + HubSpot registry**
-Global `~/.npmrc` routes to HubSpot's internal registry. For personal project global installs, pass `--registry https://registry.npmjs.org` as a flag.
+**uv PyPI index**
+`pyproject.toml` sets `[[tool.uv.index]]` with `default = true` pointing to `https://pypi.org/simple/`.
+This overrides any global uv config (e.g. HubSpot's internal mirror on managed machines).
+Do not remove the `default = true` flag.
 
-**SSH config append rule**
-`~/.ssh/config` must always use `>>` to append — never `>`, which overwrites. The personal GitHub SSH block was previously lost this way.
-
-**gh CLI multi-account switching**
-Automatic switching between HubSpot and personal accounts is handled via a custom `cd()` function in `~/.zshrc` that calls `gh auth switch --user` based on working directory, combined with `[includeIf "gitdir:..."]` blocks in `~/.gitconfig`.
+**HubSpot-managed machine only**
+The following gotchas apply only when working from a HubSpot-managed laptop:
+- Global `~/.config/uv/uv.toml` points to HubSpot's internal PyPI mirror — the project-level index config overrides this, but be aware of it.
+- Global `~/.npmrc` routes to HubSpot's internal registry. For personal project global installs, pass `--registry https://registry.npmjs.org` as a flag.
+- `~/.ssh/config` must always use `>>` to append — never `>`, which overwrites.
+- `gh` CLI account switching is handled via a `cd()` function in `~/.zshrc` combined with `[includeIf "gitdir:..."]` blocks in `~/.gitconfig`.
 
 **Directory boundaries**
 - HubSpot work: `~/Documents/HubSpot/`
@@ -100,17 +105,24 @@ Goal: working, tested pitch detection module. Audio in → cleaned, note-mapped 
 
 | Ticket | Title | Points | Status |
 |--------|-------|--------|--------|
-| SWARA-15 | Load and validate audio input | 3 | To Do |
-| SWARA-16 | Integrate CREPE for pitch detection | 5 | To Do |
+| SWARA-15 | Load and validate audio input | 3 | Done |
+| SWARA-16 | Integrate torchcrepe for pitch detection | 5 | In Progress |
 | SWARA-17 | Filter low-confidence frames | 2 | To Do |
 | SWARA-18 | Map Hz to musical notes | 3 | To Do |
-| SWARA-19 | Write ADR-002: CREPE vs alternatives | 1 | To Do |
+| SWARA-19 | Write ADR-002: pitch detection library | 1 | Done |
+
+**SWARA-15 output:** `core/audio/audio_input.py` — `load_audio(path: str) -> np.ndarray`, hardcoded `CREPE_SAMPLE_RATE = 16000`. Committed as `feat: add audio input loader with 16kHz normalisation`.
+
+**SWARA-19 output:** `docs/adr/ADR-002-pitch-detection-library.md` — documents why `torchcrepe` was chosen over the original `crepe` PyPI package (broken build metadata, abandoned since 2019, TensorFlow dependency).
 
 ---
 
 ## Key domain knowledge
 - CREPE architecture: 1D CNN, 360-bin softmax output, ~32–1975 Hz range
 - Why classification outperforms regression for pitch estimation: avoids single-value collapse on ambiguous frames
+- torchcrepe is a PyTorch reimplementation of CREPE using the same pre-trained weights — outputs are equivalent
+- torchcrepe returns `periodicity` not `confidence` — same concept, different numerical values; use the term "periodicity" in code and comments
+- torchcrepe does not expose `__version__` — verify installation with `import torchcrepe; print('torchcrepe imported OK')`
 - PESTO (PyTorch-based): comparable accuracy to CREPE at significantly lower compute cost — natural migration path if inference speed becomes a bottleneck
 - PENN: highly accurate within a specific domain but lacks CREPE's cross-domain robustness
 - The web app future reinforces the offline pipeline model: browser submits audio via API, Python engine processes and returns rendered audio — no real-time DSP required on the Python side
@@ -121,6 +133,7 @@ Goal: working, tested pitch detection module. Audio in → cleaned, note-mapped 
 | ADR | Decision | Status |
 |-----|----------|--------|
 | ADR-001 | Python as core engine language | Accepted |
+| ADR-002 | torchcrepe as pitch detection library | Accepted |
 
 ---
 

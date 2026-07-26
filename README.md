@@ -2,11 +2,9 @@
 
 Convert hummed audio to instrument playback.
 
-Hum a melody, get back a rendered musical performance. The pipeline handles pitch
-detection from raw audio, maps detected pitches to MIDI notes, and synthesizes the
-result through a chosen instrument voice.
+Hum a melody, get back a rendered musical performance. The pipeline handles pitch detection from raw audio, maps detected pitches to MIDI notes, and synthesizes the result through a chosen instrument voice.
 
-> **Status:** early development — the scaffold is in place, core modules are being built out.
+> **Status:** early development — Sprint 1 in progress, core pitch detection module being built.
 
 ---
 
@@ -14,7 +12,7 @@ result through a chosen instrument voice.
 
 | Layer | Library | Why |
 |-------|---------|-----|
-| Pitch detection | CREPE | Neural network approach; more accurate than autocorrelation on sung/hummed input |
+| Pitch detection | torchcrepe | PyTorch reimplementation of CREPE; same pre-trained weights, actively maintained |
 | Audio processing | librosa | Industry standard for audio feature extraction in Python |
 | MIDI construction | pretty_midi | Clean API for building and manipulating MIDI programmatically |
 | Synthesis | pyfluidsynth | Renders MIDI through soundfonts for realistic instrument output |
@@ -24,7 +22,7 @@ result through a chosen instrument voice.
 
 ## Prerequisites
 
-- Python 3.11+
+- Python 3.12 (project is pinned via `.python-version` — uv handles this automatically)
 - [uv](https://docs.astral.sh/uv/) — used for all dependency and virtualenv management
 
 ```bash
@@ -37,17 +35,17 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ## Quick start
 
 ```bash
-git clone git@github.com:kk-shetty/swarashruti.git
+git clone git@github-personal:kk-shetty/swarashruti.git
 cd swarashruti
 
-# Create virtualenv and install all dependencies (including dev deps)
+# Create virtualenv pinned to Python 3.12 and install all dependencies
 uv sync
 
 # Verify the setup by running the test suite
 uv run pytest
 ```
 
-That's it. No manual `pip install`, no `python -m venv`, no activation step needed — `uv run` handles the venv automatically.
+The `.python-version` file at the project root ensures uv always creates the venv with Python 3.12 regardless of what other versions are installed globally. No manual `python -m venv` or activation step needed — `uv run` handles the venv automatically.
 
 ---
 
@@ -103,7 +101,7 @@ swarashruti/
 ├── scripts/         # Utility scripts
 ├── data/            # Sample audio and reference data
 ├── docs/
-│   └── adr/         # Architecture decision records
+│   ├── adr/         # Architecture decision records
 │   └── references/  # Research and learning material
 └── tests/           # Mirrors core/ structure
     ├── audio/
