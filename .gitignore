@@ -231,3 +231,6 @@ venv/
 
 # uv
 .uv/
+
+# Binary files
+models/*.sf2

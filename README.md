@@ -29,6 +29,11 @@ Hum a melody, get back a rendered musical performance. The pipeline handles pitc
 # Install uv if you don't have it
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
+- [FluidSynth](https://www.fluidsynth.org/) — required by pyfluidsynth for audio synthesis
+
+```bash
+brew install fluid-synth
+```
 
 ---
 
@@ -40,6 +45,9 @@ cd swarashruti
 
 # Create virtualenv pinned to Python 3.12 and install all dependencies
 uv sync
+
+# Download the FluidSynth soundfont (one-time setup, ~144MB)
+bash scripts/download_soundfont.sh
 
 # Verify the setup by running the test suite
 uv run pytest
