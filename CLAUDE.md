@@ -96,24 +96,32 @@ The following gotchas apply only when working from a HubSpot-managed laptop:
 | SWARA-13 | CHANGELOG.md | `docs: add CHANGELOG with initial 0.1.0 entry` |
 | SWARA-14 | ADR-001: Python as core engine | `docs: add ADR-001 for Python core engine decision` |
 
+### Sprint 1 — Core Pipeline: Pitch Detection (Jul 28 – Aug 11 2026) ✅
+Goal: working, tested pitch detection module. Audio in → cleaned, note-mapped pitch sequence out. No MIDI yet.
+
+| Ticket | Title | Points | Commit |
+|--------|-------|--------|--------|
+| SWARA-15 | Load and validate audio input | 3 | `feat: add audio input loader with 16kHz normalisation` |
+| SWARA-16 | Integrate torchcrepe for pitch detection | 5 | `feat: integrate torchcrepe pitch detection` |
+| SWARA-17 | Filter low-confidence frames | 2 | `feat: add periodicity-based pitch frame filter` |
+| SWARA-18 | Map Hz to musical notes | 3 | `feat: add Hz to musical note mapper` |
+| SWARA-19 | Write ADR-002: pitch detection library | 1 | `docs: add ADR-002 pitch detection library` |
+
+**SWARA-15 output:** `core/audio/audio_input.py` — `load_audio(file_path: str) -> np.ndarray`, hardcoded `PIPELINE_SAMPLE_RATE = 16000`.
+
+**SWARA-16 output:** `core/pitch/pitch_detector.py` — `detect_pitch(audio: np.ndarray, sr: int = PIPELINE_SAMPLE_RATE) -> dict[str, np.ndarray]`, returns `frequency`/`periodicity`/`time` arrays via `torchcrepe.predict` (full model, `fmin=50.0`, `fmax=550.0`, `hop_length=160`).
+
+**SWARA-17 output:** `core/pitch/pitch_filter.py` — `filter_by_periodicity(pitch_data, threshold: float = DEFAULT_THRESHOLD) -> dict[str, np.ndarray]`, zeroes frequency for frames below `DEFAULT_THRESHOLD = 0.21` (torchcrepe authors' recommended threshold for clean speech) rather than dropping frames.
+
+**SWARA-18 output:** `core/pitch/note_mapper.py` — `hz_to_midi(pitch_data) -> dict[str, np.ndarray]`, adds a rounded `midi_note` array; frequency ≤ 0 maps to MIDI note 0.
+
+**SWARA-19 output:** `docs/adr/ADR-002-pitch-detection-library.md` — documents why `torchcrepe` was chosen over the original `crepe` PyPI package (broken build metadata, abandoned since 2019, TensorFlow dependency).
+
 ---
 
 ## Current sprint
 
-### Sprint 1 — Core Pipeline: Pitch Detection (Jul 28 – Aug 11 2026)
-Goal: working, tested pitch detection module. Audio in → cleaned, note-mapped pitch sequence out. No MIDI yet.
-
-| Ticket | Title | Points | Status |
-|--------|-------|--------|--------|
-| SWARA-15 | Load and validate audio input | 3 | Done |
-| SWARA-16 | Integrate torchcrepe for pitch detection | 5 | In Progress |
-| SWARA-17 | Filter low-confidence frames | 2 | To Do |
-| SWARA-18 | Map Hz to musical notes | 3 | To Do |
-| SWARA-19 | Write ADR-002: pitch detection library | 1 | Done |
-
-**SWARA-15 output:** `core/audio/audio_input.py` — `load_audio(path: str) -> np.ndarray`, hardcoded `CREPE_SAMPLE_RATE = 16000`. Committed as `feat: add audio input loader with 16kHz normalisation`.
-
-**SWARA-19 output:** `docs/adr/ADR-002-pitch-detection-library.md` — documents why `torchcrepe` was chosen over the original `crepe` PyPI package (broken build metadata, abandoned since 2019, TensorFlow dependency).
+Sprint 2 not yet planned.
 
 ---
 
