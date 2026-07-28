@@ -234,3 +234,5 @@ venv/
 
 # Binary files
 models/*.sf2
+
+notebooks/
