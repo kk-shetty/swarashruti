@@ -6,7 +6,7 @@ import numpy as np
 # crepetorch will resample to audio to 16kHz
 # However, exclusively resampling before passing to the model is more efficient.
 PIPELINE_SAMPLE_RATE = 16000
-SUPPORTED_AUDIO_FORMATS = {".wav", ".mp3", ".flac", ".ogg"}
+SUPPORTED_AUDIO_FORMATS = {".wav", ".mp3", ".flac", ".ogg", ".m4a"}
 
 
 def load_audio(file_path: str) -> np.ndarray:
