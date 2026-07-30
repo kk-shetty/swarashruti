@@ -236,3 +236,8 @@ venv/
 models/*.sf2
 
 notebooks/
+
+# ignore generated audio
+output/*.wav
+
+debug/
