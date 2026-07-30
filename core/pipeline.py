@@ -8,6 +8,7 @@ from core.midi.note_segmenter import segment_notes
 from core.pitch.note_mapper import hz_to_midi
 from core.pitch.pitch_detector import detect_pitch
 from core.pitch.pitch_filter import filter_by_periodicity
+from core.pitch.pitch_smoother import smooth_midi_notes
 from core.synthesis.synthesizer import SOUNDFONT_PATH, synthesize
 
 
@@ -99,8 +100,20 @@ def run_pipeline(
         )
         np.save(f"{debug_dir}/stage4_midi_notes.npy", midi_notes)
 
-    # Stage 5 — segment note events
-    segmented_notes = segment_notes(mapped_notes)
+    # Stage 5 — smooth MIDI notes
+    smoothed_notes = smooth_midi_notes(mapped_notes)
+    if debug:
+        smoothed_midi = smoothed_notes["midi_note"]
+        voiced_smoothed = smoothed_midi[smoothed_midi > 0]
+        unique_smoothed = sorted(np.unique(voiced_smoothed).tolist())
+        print(
+            f"[5] smooth_midi     : {len(unique_smoothed)} unique MIDI notes "
+            f"after smoothing — {unique_smoothed}"
+        )
+        np.save(f"{debug_dir}/stage5_midi_smoothed.npy", smoothed_midi)
+
+    # Stage 6 — segment note events
+    segmented_notes = segment_notes(smoothed_notes)
     if debug:
         print(f"[5] segment_notes   : {len(segmented_notes)} note events")
         for i, note in enumerate(segmented_notes):
@@ -110,7 +123,7 @@ def run_pipeline(
                 f"{note['start_time']:.3f}s → {note['end_time']:.3f}s  ({dur:.3f}s)"
             )
 
-    # Stage 6 — build MIDI object
+    # Stage 7 — build MIDI object
     midi = build_midi(segmented_notes)
     if debug:
         print("[6] build_midi      : MIDI object created")
