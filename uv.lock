@@ -2633,6 +2633,8 @@ dependencies = [
     { name = "numpy" },
     { name = "pretty-midi" },
     { name = "pyfluidsynth" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple/" }, marker = "python_full_version < '3.12'" },
+    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple/" }, marker = "python_full_version >= '3.12'" },
     { name = "soundfile" },
     { name = "torchcrepe" },
 ]
@@ -2643,8 +2645,6 @@ dev = [
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "ruff" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple/" }, marker = "python_full_version < '3.12'" },
-    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple/" }, marker = "python_full_version >= '3.12'" },
 ]
 
 [package.metadata]
@@ -2653,6 +2653,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.4.6" },
     { name = "pretty-midi", specifier = ">=0.2.11" },
     { name = "pyfluidsynth", specifier = ">=1.3.4" },
+    { name = "scipy", specifier = ">=1.17.1" },
     { name = "soundfile", specifier = ">=0.14.0" },
     { name = "torchcrepe", specifier = ">=0.0.24" },
 ]
@@ -2663,7 +2664,6 @@ dev = [
     { name = "pre-commit", specifier = ">=4.6.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "ruff", specifier = ">=0.15.22" },
-    { name = "scipy", specifier = ">=1.17.1" },
 ]
 
 [[package]]
