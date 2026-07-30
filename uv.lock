@@ -2633,6 +2633,7 @@ dependencies = [
     { name = "numpy" },
     { name = "pretty-midi" },
     { name = "pyfluidsynth" },
+    { name = "soundfile" },
     { name = "torchcrepe" },
 ]
 
@@ -2652,6 +2653,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.4.6" },
     { name = "pretty-midi", specifier = ">=0.2.11" },
     { name = "pyfluidsynth", specifier = ">=1.3.4" },
+    { name = "soundfile", specifier = ">=0.14.0" },
     { name = "torchcrepe", specifier = ">=0.0.24" },
 ]
 
