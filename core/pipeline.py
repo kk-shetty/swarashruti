@@ -4,6 +4,7 @@ import numpy as np
 
 from core.audio.audio_input import PIPELINE_SAMPLE_RATE, load_audio
 from core.midi.midi_builder import build_midi
+from core.midi.note_consolidator import consolidate_notes
 from core.midi.note_segmenter import segment_notes
 from core.pitch.note_mapper import hz_to_midi
 from core.pitch.pitch_detector import detect_pitch
@@ -116,19 +117,29 @@ def run_pipeline(
     segmented_notes = segment_notes(smoothed_notes)
     if debug:
         print(f"[5] segment_notes   : {len(segmented_notes)} note events")
-        for i, note in enumerate(segmented_notes):
-            dur = note["end_time"] - note["start_time"]
-            print(
-                f"    [{i:03d}] MIDI {note['midi_note']:3d}  "
-                f"{note['start_time']:.3f}s → {note['end_time']:.3f}s  ({dur:.3f}s)"
-            )
+        np.save(f"{debug_dir}/stage6_midi_segmented.npy", segmented_notes)
+        # for i, note in enumerate(segmented_notes):
+        #     dur = note["end_time"] - note["start_time"]
+        #     print(
+        #         f"    [{i:03d}] MIDI {note['midi_note']:3d}  "
+        #         f"{note['start_time']:.3f}s → {note['end_time']:.3f}s  ({dur:.3f}s)"
+        #     )
 
-    # Stage 7 — build MIDI object
-    midi = build_midi(segmented_notes)
+    # Stage 7 - consolidate note events
+    consolidated_notes = consolidate_notes(segmented_notes)  # ← new
+    if debug:
+        print(
+            f"[5.5] consolidate   : {len(segmented_notes)} → "
+            f"{len(consolidated_notes)} note events after consolidation"
+        )
+        np.save(f"{debug_dir}/stage7_midi_consolidated.npy", consolidated_notes)
+
+    # Stage 8 — build MIDI object
+    midi = build_midi(consolidated_notes)
     if debug:
         print("[6] build_midi      : MIDI object created")
 
-    # Stage 7 — synthesize audio
+    # Stage 9 — synthesize audio
     audio = synthesize(midi=midi, soundfont_path=soundfont_path)
     if debug:
         output_duration = len(audio) / 44100
