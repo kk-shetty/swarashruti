@@ -1,6 +1,7 @@
 import pytest
 
 from core.midi.note_consolidator import (
+    MAX_ABSORPTION_GAP,
     MIN_CONSOLIDATION_DURATION,
     consolidate_notes,
 )
@@ -57,3 +58,16 @@ def test_returns_correct_dict_keys() -> None:
 def test_default_min_duration_constant() -> None:
     """Default threshold is 0.15s — the identified portamento range ceiling."""
     assert MIN_CONSOLIDATION_DURATION == 0.15
+
+
+def test_short_note_with_large_gap_is_dropped() -> None:
+    """Short note far from predecessor is dropped, not absorbed — it's silence noise."""
+    events = [_note(60, 0.0, 0.5), _note(61, 1.5, 1.6)]  # 1.0s gap
+    result = consolidate_notes(events)
+    assert len(result) == 1
+    assert result[0]["end_time"] == pytest.approx(0.5)  # predecessor unchanged
+
+
+def test_max_absorption_gap_constant() -> None:
+    """Default absorption gap is 0.20s."""
+    assert MAX_ABSORPTION_GAP == 0.20
