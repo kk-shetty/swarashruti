@@ -2,8 +2,9 @@ import numpy as np
 
 # torchcrepe periodicity is a sigmoid activation, not a probability.
 # 0.21 is the threshold recommended by the torchcrepe authors for clean speech;
-# tune upward for noisier input or stricter voiced-frame requirements.
-DEFAULT_THRESHOLD = 0.21
+# Raised to 0.30 for singing/humming input - real-world tests showed the 0.21
+# threshold passes too many borderline frames, contributing to note fragmentation.
+DEFAULT_THRESHOLD = 0.30
 
 
 def filter_by_periodicity(

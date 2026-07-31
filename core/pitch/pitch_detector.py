@@ -44,6 +44,7 @@ def detect_pitch(
         fmin=FMIN,
         fmax=FMAX,
         model="full",
+        decoder=torchcrepe.decode.viterbi,
         return_periodicity=True,
     )
 
