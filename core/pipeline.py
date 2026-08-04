@@ -3,6 +3,7 @@ import os
 import numpy as np
 
 from core.audio.audio_input import PIPELINE_SAMPLE_RATE, load_audio
+from core.audio.silence_gate import apply_silence_gate
 from core.midi.midi_builder import build_midi
 from core.midi.note_consolidator import consolidate_notes
 from core.midi.note_segmenter import segment_notes
@@ -77,8 +78,20 @@ def run_pipeline(
         np.save(f"{debug_dir}/stage2_frequency.npy", freqs)
         np.save(f"{debug_dir}/stage2_periodicity.npy", pitch_data["periodicity"])
 
+    # Stage 2.5 — silence gate
+    gated_pitch_data = apply_silence_gate(pitch_data, audio_time_series)
+    if debug:
+        freqs_gated = gated_pitch_data["frequency"]
+        voiced_gated = freqs_gated[freqs_gated > 0]
+        silenced = len(voiced) - len(voiced_gated)
+        print(
+            f"[2.5] silence_gate  : {len(voiced_gated)} voiced frames remain, "
+            f"{silenced} silenced by energy gate"
+        )
+        np.save(f"{debug_dir}/stage2_5_frequency_gated.npy", freqs_gated)
+
     # Stage 3 — filter by periodicity
-    filtered_pitch_data = filter_by_periodicity(pitch_data)
+    filtered_pitch_data = filter_by_periodicity(gated_pitch_data)
     if debug:
         freqs_filtered = filtered_pitch_data["frequency"]
         voiced_filtered = freqs_filtered[freqs_filtered > 0]
